@@ -83,20 +83,20 @@ func getQuery() (dep, arr, by string) {
 	return
 }
 
-var ErrNoTrains = errors.New("no suitable trains")
-
 func FindTrains(dep, arr, criteria string) (Trains, error) {
 	depID, arrID, err := validateQuery(dep, arr, criteria)
 	if err != nil {
 		return nil, err
 	}
+
 	trains, err := getTrains()
 	if err != nil {
 		return nil, err
 	}
+
 	foundTrains := trains.findBy(depID, arrID).sortBy(criteria)
 	if len(foundTrains) == 0 {
-		return nil, ErrNoTrains
+		return nil, nil
 	}
 	if len(foundTrains) > 3 {
 		foundTrains = foundTrains[:3]
