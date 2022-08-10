@@ -97,27 +97,54 @@ var (
 	errBadCriteria = errors.New("unsupported criteria")
 )
 
-func FindTrains(dep, arr, criteria string) (Trains, error) {
-	if dep == "" {
-		return nil, errEmptyDep
-	}
-	depID, err := strconv.Atoi(dep)
-	if err != nil || depID < 0 {
-		return nil, errBadDep
-	}
-
-	if arr == "" {
-		return nil, errEmptyArr
-	}
-	arrID, err := strconv.Atoi(arr)
-	if err != nil || arrID < 0 {
-		return nil, errBadArr
-	}
-
+func validateCriteria(criteria string) error {
 	switch criteria {
 	case sortCriteriaPrice, sortCriteriaArr, sortCriteriaDep:
+		return nil
 	default:
-		return nil, errBadCriteria
+		return errBadCriteria
+	}
+}
+
+func validateDep(dep string) (int, error) {
+	if dep == "" {
+		return 0, errEmptyDep
+	}
+
+	depID, err := strconv.Atoi(dep)
+	if err != nil || depID < 0 {
+		return 0, errBadDep
+	}
+
+	return depID, nil
+}
+
+func validateArr(arr string) (int, error) {
+	if arr == "" {
+		return 0, errEmptyArr
+	}
+
+	arrID, err := strconv.Atoi(arr)
+	if err != nil || arrID < 0 {
+		return 0, errBadArr
+	}
+
+	return arrID, nil
+}
+
+func FindTrains(dep, arr, criteria string) (Trains, error) {
+	depID, err := validateDep(dep)
+	if err != nil {
+		return nil, err
+	}
+
+	arrID, err := validateArr(arr)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := validateCriteria(criteria); err != nil {
+		return nil, err
 	}
 
 	trains, err := getTrains()
